@@ -57,7 +57,7 @@ tasks {
 // Configure plugin.yml generation
 bukkit {
   load = BukkitPluginDescription.PluginLoadOrder.STARTUP
-  main = "me.enchantingtableplugin.enchantingtable"
-  apiVersion = "1.18"
-  authors = listOf("Author")
+  main = "me.enchantingtableplugin.enchantingtable.EnchantingTable"
+  apiVersion = "1.19"
+  authors = listOf("Slz","Barril")
 }
