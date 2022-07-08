@@ -1,39 +1,97 @@
-package io.papermc.paperweight.testplugin;
+package me.enchantingtableplugin.enchantingtable;
 
-import java.util.Collection;
-import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
-import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
-import org.bukkit.craftbukkit.v1_19_R1.CraftServer;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.inventory.InventoryInteractEvent;
+import org.bukkit.event.inventory.InventoryMoveItemEvent;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
-import static net.minecraft.commands.Commands.argument;
-import static net.minecraft.commands.Commands.literal;
-import static net.minecraft.commands.arguments.EntityArgument.players;
+public final class EnchantingTable extends JavaPlugin implements Listener {
+  World world;
+  int Counter = 0;
 
-public final class TestPlugin extends JavaPlugin implements Listener {
   @Override
   public void onEnable() {
-    this.getServer().getPluginManager().registerEvents(this, this);
-    ((CraftServer) this.getServer()).getServer().vanillaCommandDispatcher.getDispatcher().register(
-      literal("paperweight")
-        .requires(stack -> stack.hasPermission(stack.getServer().getOperatorUserPermissionLevel()))
-        .then(argument("players", players())
-          .executes(ctx -> {
-            final Collection<ServerPlayer> players = EntityArgument.getPlayers(ctx, "players");
-            for (final ServerPlayer player : players) {
-              player.sendSystemMessage(
-                Component.literal("Hello from Paperweight test plugin!")
-                  .withStyle(ChatFormatting.ITALIC, ChatFormatting.GREEN)
-                  .withStyle(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/paperweight @a")))
-              );
-            }
-            return players.size();
-          }))
-    );
+
+    getServer().getPluginManager().registerEvents(this, this);
   }
+
+  @EventHandler
+  public void Join(PlayerJoinEvent e) {
+
+    world = e.getPlayer().getWorld();
+
+  }
+
+  @EventHandler
+  public void pickUpEvent(EntityPickupItemEvent e) {
+
+    if (e.getEntity() instanceof Player && e.getItem().getItemStack().getType() == Material.ENCHANTING_TABLE){
+      System.out.println("passou o teste de pegar a mesa de encantamento");
+      Player player = (Player) e.getEntity();
+
+
+      world.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1000f, 0f);
+      new BukkitRunnable() {
+        @Override
+        public void run() {
+          world.spawnParticle(Particle.GLOW_SQUID_INK, player.getLocation(), 2500, 0.1, 250 ,0.1);
+          Counter++;
+          if(Counter >= 50) {
+            this.cancel();
+          }
+        }
+      }.runTaskTimer(this, 0, 2);
+      Counter = 0;
+
+    }
+
+  }
+
+  @EventHandler
+  public void placeBlock(BlockPlaceEvent e) {
+    Player player = e.getPlayer();
+    Block block = e.getBlockPlaced();
+
+    if (block.getType() == Material.ENCHANTING_TABLE) {
+      world.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1000f, 0f);
+      new BukkitRunnable() {
+        @Override
+        public void run() {
+          world.spawnParticle(Particle.GLOW_SQUID_INK, block.getLocation(), 2500, 0.1, 250 ,0.1);
+          Counter++;
+          if(Counter >= 50) {
+            this.cancel();
+          }
+        }
+      }.runTaskTimer(this, 0, 2);
+      Counter = 0;
+    }
+  }
+
+  @EventHandler
+  public void inventoryInteract(InventoryMoveItemEvent e) {
+
+    if (e.getItem().getType() == Material.ENCHANTING_TABLE && !(e.getDestination().getType() == InventoryType.PLAYER)) {
+      System.out.println("passou o teste de mover inventarios");
+
+      e.setCancelled(true);
+
+    }
+
+  }
+
 }
