@@ -1,9 +1,7 @@
 package me.enchantingtableplugin.enchantingtable;
 
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import net.kyori.adventure.text.Component;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -22,7 +20,8 @@ public final class EnchantingTable extends JavaPlugin implements Listener {
 
   @Override
   public void onEnable() {
-
+    Component test = Component.text("atualizou");
+    world.sendMessage(test);
     getServer().getPluginManager().registerEvents(this, this);
   }
 
@@ -39,17 +38,7 @@ public final class EnchantingTable extends JavaPlugin implements Listener {
     if (e.getEntity() instanceof Player player && e.getItem().getItemStack().getType() == Material.ENCHANTING_TABLE){
       System.out.println("passou o teste de pegar a mesa de encantamento");
       world.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1000f, 0f);
-      new BukkitRunnable() {
-        @Override
-        public void run() {
-          world.spawnParticle(Particle.GLOW_SQUID_INK, player.getLocation(), 2500, 0.1, 250 ,0.1);
-          Counter++;
-          if(Counter >= 50) {
-            this.cancel();
-          }
-        }
-      }.runTaskTimer(this, 0, 2);
-      Counter = 0;
+      spawnParticle(player.getLocation());
 
     }
 
@@ -62,17 +51,8 @@ public final class EnchantingTable extends JavaPlugin implements Listener {
 
     if (block.getType() == Material.ENCHANTING_TABLE) {
       world.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1000f, 0f);
-      new BukkitRunnable() {
-        @Override
-        public void run() {
-          world.spawnParticle(Particle.GLOW_SQUID_INK, block.getLocation(), 2500, 0.1, 250 ,0.1);
-          Counter++;
-          if(Counter >= 50) {
-            this.cancel();
-          }
-        }
-      }.runTaskTimer(this, 0, 2);
-      Counter = 0;
+
+      spawnParticle(block.getLocation());
     }
   }
 
@@ -86,6 +66,23 @@ public final class EnchantingTable extends JavaPlugin implements Listener {
 
     }
 
+  }
+
+  public void spawnParticle(Location loc) {
+
+    new BukkitRunnable() {
+      public final Location location = loc;
+      @Override
+      public void run() {
+        world.spawnParticle(Particle.GLOW_SQUID_INK,location,2500,0.1,2500,0.1);
+        Counter++;
+        if (Counter >= 75) {
+          this.cancel();
+        }
+
+      }
+    }.runTaskTimer(this, 0, 0);
+    Counter = 0;
   }
 
 }
