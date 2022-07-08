@@ -5,17 +5,14 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -39,11 +36,8 @@ public final class EnchantingTable extends JavaPlugin implements Listener {
   @EventHandler
   public void pickUpEvent(EntityPickupItemEvent e) {
 
-    if (e.getEntity() instanceof Player && e.getItem().getItemStack().getType() == Material.ENCHANTING_TABLE){
+    if (e.getEntity() instanceof Player player && e.getItem().getItemStack().getType() == Material.ENCHANTING_TABLE){
       System.out.println("passou o teste de pegar a mesa de encantamento");
-      Player player = (Player) e.getEntity();
-
-
       world.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1000f, 0f);
       new BukkitRunnable() {
         @Override
